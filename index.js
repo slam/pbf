@@ -333,7 +333,6 @@ Pbf.prototype = {
     },
 
     writeMessage: function(tag, fn, obj) {
-        console.log('writeMessage: pos='+this.pos);
         this.writeTag(tag, Pbf.Bytes);
         this.writeRawMessage(fn, obj);
     },
