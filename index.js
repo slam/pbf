@@ -222,6 +222,7 @@ Pbf.prototype = {
     },
 
     finish: function() {
+        console.log('finish: length='+this.pos);
         this.length = this.pos;
         this.pos = 0;
         return this.buf.subarray(0, this.length);
