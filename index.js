@@ -28,7 +28,6 @@ Pbf.prototype = {
     // === READING =================================================================
 
     readFields: function(readField, result, end) {
-        console.log(readField.name);
         end = end || this.length;
 
         while (this.pos < end) {
@@ -47,16 +46,19 @@ Pbf.prototype = {
     },
 
     readMessage: function(readField, result) {
+        console.log('readMessage');
         return this.readFields(readField, result, this.readVarint() + this.pos);
     },
 
     readFixed32: function() {
+        console.log('readFixed32');
         var val = readUInt32(this.buf, this.pos);
         this.pos += 4;
         return val;
     },
 
     readSFixed32: function() {
+        console.log('readSFixed32');
         var val = readInt32(this.buf, this.pos);
         this.pos += 4;
         return val;
@@ -65,30 +67,35 @@ Pbf.prototype = {
     // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
 
     readFixed64: function() {
+        console.log('readFixed64');
         var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
         this.pos += 8;
         return val;
     },
 
     readSFixed64: function() {
+        console.log('readSFixed64');
         var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
         this.pos += 8;
         return val;
     },
 
     readFloat: function() {
+        console.log('readFloat');
         var val = ieee754.read(this.buf, this.pos, true, 23, 4);
         this.pos += 4;
         return val;
     },
 
     readDouble: function() {
+        console.log('readDouble');
         var val = ieee754.read(this.buf, this.pos, true, 52, 8);
         this.pos += 8;
         return val;
     },
 
     readVarint: function(isSigned) {
+        console.log('readVarint');
         var buf = this.buf,
             val, b;
 
@@ -102,19 +109,23 @@ Pbf.prototype = {
     },
 
     readVarint64: function() { // for compatibility with v2.0.1
+        console.log('readVarint64');
         return this.readVarint(true);
     },
 
     readSVarint: function() {
+        console.log('readSVarint');
         var num = this.readVarint();
         return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
     },
 
     readBoolean: function() {
+        console.log('readBoolean');
         return Boolean(this.readVarint());
     },
 
     readString: function() {
+        console.log('readString');
         var end = this.readVarint() + this.pos,
             str = readUtf8(this.buf, this.pos, end);
         this.pos = end;
@@ -122,6 +133,7 @@ Pbf.prototype = {
     },
 
     readBytes: function() {
+        console.log('readBytes');
         var end = this.readVarint() + this.pos,
             buffer = this.buf.subarray(this.pos, end);
         this.pos = end;
@@ -131,6 +143,7 @@ Pbf.prototype = {
     // verbose for performance reasons; doesn't affect gzipped size
 
     readPackedVarint: function(arr, isSigned) {
+        console.log('readPackedVarint');
         if (this.type !== Pbf.Bytes) return arr.push(this.readVarint(isSigned));
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -138,6 +151,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedSVarint: function(arr) {
+        console.log('readPackedSVarint');
         if (this.type !== Pbf.Bytes) return arr.push(this.readSVarint());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -145,6 +159,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedBoolean: function(arr) {
+        console.log('readPackedBoolean');
         if (this.type !== Pbf.Bytes) return arr.push(this.readBoolean());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -152,6 +167,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedFloat: function(arr) {
+        console.log('readPackedFloat');
         if (this.type !== Pbf.Bytes) return arr.push(this.readFloat());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -159,6 +175,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedDouble: function(arr) {
+        console.log('readPackedDouble');
         if (this.type !== Pbf.Bytes) return arr.push(this.readDouble());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -166,6 +183,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedFixed32: function(arr) {
+        console.log('readPackedFixed32');
         if (this.type !== Pbf.Bytes) return arr.push(this.readFixed32());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -173,6 +191,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedSFixed32: function(arr) {
+        console.log('readPackedSFixed32');
         if (this.type !== Pbf.Bytes) return arr.push(this.readSFixed32());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -180,6 +199,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedFixed64: function(arr) {
+        console.log('readPackedFixed64');
         if (this.type !== Pbf.Bytes) return arr.push(this.readFixed64());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -187,6 +207,7 @@ Pbf.prototype = {
         return arr;
     },
     readPackedSFixed64: function(arr) {
+        console.log('readPackedSFixed64');
         if (this.type !== Pbf.Bytes) return arr.push(this.readSFixed64());
         var end = readPackedEnd(this);
         arr = arr || [];
@@ -195,6 +216,7 @@ Pbf.prototype = {
     },
 
     skip: function(val) {
+        console.log('skip');
         var type = val & 0x7;
         if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
         else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
