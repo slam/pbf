@@ -28,7 +28,6 @@ Pbf.prototype = {
     // === READING =================================================================
 
     readFields: function(readField, result, end) {
-        console.log(readField);
         end = end || this.length;
 
         while (this.pos < end) {
@@ -37,7 +36,9 @@ Pbf.prototype = {
                 startPos = this.pos;
 
             this.type = val & 0x7;
+            console.log(tag);
             readField(tag, result, this);
+            console.log(result);
 
             if (this.pos === startPos) this.skip(val);
         }
