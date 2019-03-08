@@ -28,8 +28,8 @@ Pbf.prototype = {
     // === READING =================================================================
 
     readFields: function(readField, result, end) {
-        console.log('readFields: pos='+this.pos);
         end = end || this.length;
+        console.log('readFields: pos='+this.pos+" end="+end);
 
         while (this.pos < end) {
             var val = this.readVarint(),
