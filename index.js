@@ -28,7 +28,7 @@ Pbf.prototype = {
     // === READING =================================================================
 
     readFields: function(readField, result, end) {
-        console.log('readFields');
+        console.log('readFields: pos='+this.pos);
         end = end || this.length;
 
         while (this.pos < end) {
@@ -37,9 +37,8 @@ Pbf.prototype = {
                 startPos = this.pos;
 
             this.type = val & 0x7;
-            console.log(tag);
+            console.log('tag:' + tag);
             readField(tag, result, this);
-            console.log(result);
 
             if (this.pos === startPos) this.skip(val);
         }
@@ -100,13 +99,36 @@ Pbf.prototype = {
         var buf = this.buf,
             val, b;
 
-        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;
-        b = buf[this.pos];   val |= (b & 0x0f) << 28;
+        b = buf[this.pos++];
+        val  =  b & 0x7f;
+        if (b < 0x80) {
+            console.log('readVarint: val=' + val + ' pos=' + this.pos);
+            return val;
+        }
+        b = buf[this.pos++];
+        val |= (b & 0x7f) << 7;
+        if (b < 0x80) {
+            console.log('readVarint: val=' + val + ' pos=' + this.pos);
+            return val;
+        }
+        b = buf[this.pos++];
+        val |= (b & 0x7f) << 14;
+        if (b < 0x80) {
+            console.log('readVarint: val=' + val + ' pos=' + this.pos);
+            return val;
+        }
+        b = buf[this.pos++];
+        val |= (b & 0x7f) << 21;
+        if (b < 0x80) {
+            console.log('readVarint: val=' + val + ' pos=' + this.pos);
+            return val;
+        }
+        b = buf[this.pos];
+        val |= (b & 0x0f) << 28;
 
-        return readVarintRemainder(val, isSigned, this);
+        var vi = readVarintRemainder(val, isSigned, this);
+        console.log('readVarint: val=' + vi + ' pos=' + this.pos);
+        return vi;
     },
 
     readVarint64: function() { // for compatibility with v2.0.1
@@ -217,7 +239,7 @@ Pbf.prototype = {
     },
 
     skip: function(val) {
-        console.log('skip');
+        console.log('skip:' + val);
         var type = val & 0x7;
         if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
         else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
@@ -416,6 +438,7 @@ Pbf.prototype = {
 };
 
 function readVarintRemainder(l, s, p) {
+    console.log('readVarintRemainder');
     var buf = p.buf,
         h, b;
 
