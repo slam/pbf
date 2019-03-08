@@ -28,6 +28,7 @@ Pbf.prototype = {
     // === READING =================================================================
 
     readFields: function(readField, result, end) {
+        console.log(readField.name);
         end = end || this.length;
 
         while (this.pos < end) {
