@@ -213,6 +213,7 @@ Pbf.prototype = {
 
         if (length !== this.length) {
             var buf = new Uint8Array(length);
+            console.log('realloc: newLength='+length+' oldLength='+this.length+' byteLength='+buf.byteLength);
             buf.set(this.buf);
             this.buf = buf;
             this.length = length;
