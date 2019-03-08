@@ -471,7 +471,9 @@ function makeRoomForExtraLength(startPos, len, pbf) {
         len <= 0x3fff ? 1 :
         len <= 0x1fffff ? 2 :
         len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
-    console.log('makeRoomForExtraLength: startPos='+startPos+' len='+len+' extraLen='+extraLen);
+    if (len > 1000000) {
+        console.log('makeRoomForExtraLength: startPos='+startPos+' len='+len+' extraLen='+extraLen);
+    }
 
     // if 1 byte isn't enough for encoding message length, shift the data to the right
     pbf.realloc(extraLen);
